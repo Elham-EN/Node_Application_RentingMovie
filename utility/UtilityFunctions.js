@@ -1,5 +1,5 @@
 function findSpecificGenre(courses, request) {
-  return courses.find((c) => c.id === parseInt(request.params.id));
+  return courses.find((c) => c.genreID === parseInt(request.params.id));
 }
 
 function checkIfGenreExist(courses, request, response) {
