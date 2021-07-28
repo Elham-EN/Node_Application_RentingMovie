@@ -26,14 +26,14 @@ const Genre = mongoose.model("Genre", genreSchema);
 //Fetch collection of genres
 router.get("/", async (req, res) => {
   const genres = await Genre.find();
-  res.send(genres);
+  console.log(genres);
+  res.send(`<h1> ${genres} </h1>`);
   res.end();
 });
 
 //Fetch single genre
 router.get("/:id", async (req, res) => {
   const genres = await Genre.find();
-  console.log(genres.length);
   const genre = checkIfGenreExist(genres, req, res);
   if (!genre) return;
   res.send(
