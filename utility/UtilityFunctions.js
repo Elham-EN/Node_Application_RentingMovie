@@ -1,9 +1,9 @@
-function findSpecificGenre(courses, request) {
-  return courses.find((c) => c.genreID === parseInt(request.params.id));
+function findSpecificGenre(genres, request) {
+  return genres.find((c) => c.genreID === parseInt(request.params.id));
 }
 
-function checkIfGenreExist(courses, request, response) {
-  const course = findSpecificGenre(courses, request);
+function checkIfGenreExist(genres, request, response) {
+  const course = findSpecificGenre(genres, request);
   if (!course)
     return response
       .status(404)
