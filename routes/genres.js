@@ -1,23 +1,9 @@
-const utilitiesModule = require("../utility/UtilityFunctions");
-const findSpecificGenre = utilitiesModule.findSpecificGenre;
-const checkIfGenreExist = utilitiesModule.checkIfGenreExist;
-const validateRequestData = utilitiesModule.validateRequestData;
-
+const Validation = require("../utility/UtilityFunctions");
 const express = require("express");
 const router = express.Router();
-
 const mongoose = require("mongoose");
 
-mongoose
-  .connect("mongodb://localhost/movieDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connected to the MongoDB..."))
-  .catch((err) => console.log("Could not connect to MongoDB...", err));
-
 const genreSchema = new mongoose.Schema({
-  genreID: { type: Number, required: true },
   genreName: { type: String, required: true },
 });
 
@@ -34,36 +20,22 @@ router.get("/", async (req, res) => {
 //Fetch single genre
 router.get("/:id", async (req, res) => {
   const genres = await Genre.find();
-  const genre = checkIfGenreExist(genres, req, res);
-  if (!genre) return;
-  res.send(
-    `<h1>Genre ID: ${genre.genreID} Genre Name: ${genre.genreName}</h1>`
-  );
+  const genre = new Validation(genres, req, res).createValidationType("genres");
+  const genreExist = genre.checkIfDocumentExist();
+  if (!genreExist) return;
+  res.send(`<h1> Genre ID: ${genreExist._id} Genre Name: ${genreExist.genreName}</h1>`);
   res.end();
 });
 
-async function createGenre(genreObject) {
-  const genre = new Genre(genreObject);
-  try {
-    const result = await genre.save();
-    console.log(result);
-  } catch (exception) {
-    for (field in exception.errors) {
-      console.log(exception.errors[field].message);
-    }
-  }
-}
-
 //Create a new Genre
 router.post("/", async (req, res) => {
-  const invalidData = validateRequestData(req, res);
+  const genreObject = new Validation(null, req, res).createValidationType("genres");
+  const invalidData = genreObject.validateRequestedData();
   if (invalidData) return;
-  const genres = await Genre.find();
-  const genre = {
-    genreID: genres.length + 1,
+  let genre = new Genre({
     genreName: req.body.name,
-  };
-  createGenre(genre);
+  });
+  genre = await genre.save();
   res.send(genre);
   res.end();
 });
@@ -71,14 +43,15 @@ router.post("/", async (req, res) => {
 //Update a specific genre
 router.put("/:id", async (req, res) => {
   const genres = await Genre.find();
-  const genreExist = checkIfGenreExist(genres, req, res);
+  const genreObject = new Validation(genres, req, res).createValidationType("genres");
+  const genreExist = genreObject.checkIfDocumentExist();
   if (!genreExist) return;
-  const invalidData = validateRequestData(req, res);
+  const invalidData = genreObject.validateRequestedData();
   if (invalidData) return;
-  const genre = findSpecificGenre(genres, req);
+  const genre = genreObject.findSpecificDocument();
   if (!genre) return;
   const updateGenre = await Genre.updateOne(
-    { genreID: req.params.id },
+    { _id: req.params.id },
     {
       $set: {
         genreName: req.body.name,
@@ -92,10 +65,11 @@ router.put("/:id", async (req, res) => {
 //Delete Specific genre
 router.delete("/:id", async (req, res) => {
   const genres = await Genre.find();
-  const genreExist = checkIfGenreExist(genres, req, res);
+  const genreObject = new Validation(genres, req, res).createValidationType("genres");
+  const genreExist = genreObject.checkIfDocumentExist();
   if (!genreExist) return;
   const deleteGenre = await Genre.deleteOne({
-    genreID: req.params.id,
+    _id: req.params.id,
   });
   res.send(deleteGenre);
   res.end();
