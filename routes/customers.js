@@ -1,15 +1,7 @@
-const Validation = require("../utility/validation");
-const mongoose = require("mongoose");
+const Validation = require("../validation/validation");
+const Customer = require("../model/customers");
 const express = require("express");
 const router = express.Router();
-
-const customerSchema = new mongoose.Schema({
-  isGold: { type: Boolean, required: true },
-  name: { type: String, required: true },
-  phone: { type: String, required: true },
-});
-
-const Customer = mongoose.model("Customer", customerSchema);
 
 router.get("/", async (req, res) => {
   const customers = await Customer.find();

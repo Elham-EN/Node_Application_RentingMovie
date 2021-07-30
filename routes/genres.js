@@ -1,13 +1,7 @@
-const Validation = require("../utility/UtilityFunctions");
+const Validation = require("../validation/validation");
+const Genre = require("../model/genres");
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-
-const genreSchema = new mongoose.Schema({
-  genreName: { type: String, required: true },
-});
-
-const Genre = mongoose.model("Genre", genreSchema);
 
 //Fetch collection of genres
 router.get("/", async (req, res) => {
