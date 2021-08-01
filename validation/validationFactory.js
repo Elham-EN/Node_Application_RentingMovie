@@ -1,4 +1,4 @@
-const DataValidation = require("./validationFactory");
+const DataValidation = require("./validations");
 
 /**
  * Defining an interface for creating an object but letting the subclasses of
@@ -15,6 +15,8 @@ class ValidationFactory {
       case "customers":
         return new DataValidation(this.collection, this.request, this.response);
       case "genres":
+        return new DataValidation(this.collection, this.request, this.response);
+      case "movies":
         return new DataValidation(this.collection, this.request, this.response);
     }
   }

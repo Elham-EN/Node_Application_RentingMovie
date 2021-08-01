@@ -1,5 +1,5 @@
-const Validation = require("../validation/validation");
-const Genre = require("../model/genres");
+const Validation = require("../validation/validationFactory");
+const { Genre } = require("../model/genre");
 const express = require("express");
 const router = express.Router();
 
