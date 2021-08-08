@@ -1,5 +1,5 @@
 const Validation = require("../validation/validationFactory");
-const Customer = require("../model/customer");
+const Customer = require("../models/customer");
 const express = require("express");
 const router = express.Router();
 

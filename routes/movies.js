@@ -1,6 +1,6 @@
 const Validation = require("../validation/validationFactory");
-const Movie = require("../model/movie");
-const { Genre } = require("../model/genre");
+const Movie = require("../models/movie");
+const { Genre } = require("../models/genre");
 const express = require("express");
 const router = express.Router();
 

@@ -21,14 +21,12 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const rentalObject = new Validation(null, req, res).createValidationType("rentals");
-  const invalidData = rentalObject.validateRequestedData();
-  if (invalidData) return res.status(400).send("The data is invalid");
   const customer = await Customer.findById(req.body.customerId);
   if (!customer) return res.status(400).send("Invalid customer.");
   const movie = await Movie.findById(req.body.movieId);
   if (!movie) return res.status(400).send("Invalid movie.");
   if (movie.numberOfStock === 0) return res.status(400).send("Movie not in stock.");
+  //Mongoose schema set up the default value for
   let rental = new Rental({
     customer: {
       _id: customer._id,
@@ -41,9 +39,9 @@ router.post("/", async (req, res) => {
       dailyRentalRate: movie.dailyRentalRate,
     },
   });
-  rental = await rental.save();
+  //rental = await rental.save();
   //Then update numberInStock prop of movie and save it
-  movie.numberOfStock--;
+  //movie.numberOfStock--;
   /**
    * We have a problem, we have two separate operations, it is possible after we
    * save this rental something goes wrong or the server crashes or connection to
@@ -52,7 +50,19 @@ router.post("/", async (req, res) => {
    * in the database or none of them will be applied. So they are atomic, they both
    * complete or they both roll back.
    */
-  movie.save();
-  //Create a task object which is like a transaction
-  res.send(rental);
+  //movie.save();
+  //Create a task object which is like a transaction. We can add one or more operation
+  //And all of these operations togther will be treated a unit. First arg - collection
+  //second arg rental object. Here we are working directly with collection.
+  try {
+    new Fawn.Task()
+      .save("rentals", rental)
+      .update("movies", { _id: movie._id }, { $inc: { numberOfStock: -1 } })
+      .run();
+    res.send(rental);
+  } catch (exception) {
+    res.status(500).send("Something failed");
+  }
 });
+
+module.exports = router;
