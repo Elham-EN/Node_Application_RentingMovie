@@ -18,6 +18,8 @@ class ValidationFactory {
         return new DataValidation(this.collection, this.request, this.response);
       case "movies":
         return new DataValidation(this.collection, this.request, this.response);
+      case "rentals":
+        return new DataValidation(this.collection, this.request, this.response);
     }
   }
 }
